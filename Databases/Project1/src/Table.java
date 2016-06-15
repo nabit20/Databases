@@ -218,15 +218,39 @@ public class Table
      * @param table2  The rhs table in the minus operation
      * @return  a table representing the difference
      */
-    public Table minus (Table table2)
+public Table minus (Table table2)
     {
-        out.println ("RA> " + name + ".minus (" + table2.name + ")");
-        if (! compatible (table2)) return null;
+   
+    	out.println ("RA> " + name + ".minus (" + table2.name + ")");
+    	if (! compatible (table2)) return null;
 
-        List <Comparable []> rows = new ArrayList <> ();
+    	List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+    	boolean shouldAdd = true; //Boolean to determine whether to add or not
 
+    	KeyType[] thisTupleKey = new KeyType[tuples.size()]; //Creating KeyType Object array to get ready to compare the tuples 
+    	KeyType[] tableTwoKey = new KeyType[table2.tuples.size()]; //Creating KeyType Object array to get ready to compare the tuples
+
+    	for(int i = 0; i < thisTupleKey.length; i++){ //Initializing the array with the tuples initialized in each constructor 
+    		thisTupleKey[i] = new KeyType(tuples.get(i));
+    	}
+    	for(int i = 0; i < tableTwoKey.length; i++){ //Initializing the array with the tuples initialized in each constructor 
+    		tableTwoKey[i] = new KeyType(table2.tuples.get(i));
+    	}
+
+    	for(int i = 0; i < thisTupleKey.length; i++){ //Nested for loop comparing each row of this table with each row of table2, then adding the rows to new table if none of them match
+    		shouldAdd = true;
+    		for(int j = 0; j < tableTwoKey.length; j++){
+    			if(thisTupleKey[i].compareTo(tableTwoKey[j]) == 0){
+    				shouldAdd = false;
+    			}
+    			if (j == tableTwoKey.length - 1 && shouldAdd == true){
+    				rows.add(tuples.get(i));
+    			}
+    		}
+    	}
+
+        
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
 
