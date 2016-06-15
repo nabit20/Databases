@@ -131,6 +131,7 @@ public class Table
      * @param attributes  the attributes to project onto
      * @return  a table of projected tuples
      */
+    //completed by Alyssa Cowan
     public Table project (String attributes)
     {
         out.println ("RA> " + name + ".project (" + attributes + ")");
@@ -139,8 +140,11 @@ public class Table
         String [] newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
+        
+        rows = tuples //stream all tuples
+        		.stream()
+        		.map(t -> extract(t, attrs)) //given each tuple, using extract function, return shorter tuple using supplied attributes
+        		.collect(Collectors.toList()); //collect new tuples into list
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
