@@ -188,6 +188,8 @@ public class Table
      * @param table2  the rhs table in the union operation
      * @return  a table representing the union
      */
+    
+    //Completed by Ashik
     public Table union (Table table2)
     {
         out.println ("RA> " + name + ".union (" + table2.name + ")");
