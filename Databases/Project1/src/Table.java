@@ -175,12 +175,12 @@ public class Table
      */
     public Table select (KeyType keyVal)
     {
-        out.println ("RA> " + name + ".select (" + keyVal + ")");
+        //completed by Kyler 
+		out.println ("RA> " + name + ".select (" + keyVal + ")");
 
-        List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
-
+        List <Comparable []> rows = new ArrayList <> (); //create empty ArrayList
+        rows.add (index.get (keyVal)); //add mapped tuples with same predicates as keyVal to rows
+        
         return new Table (name + count++, attribute, domain, key, rows);
     } // select
 
