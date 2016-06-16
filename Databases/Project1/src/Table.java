@@ -221,7 +221,7 @@ public class Table
      * @param table2  The rhs table in the minus operation
      * @return  a table representing the difference
      */
-public Table minus (Table table2)
+    public Table minus (Table table2)
     {
    
     	out.println ("RA> " + name + ".minus (" + table2.name + ")");
@@ -252,6 +252,7 @@ public Table minus (Table table2)
     			}
     		}
     	}
+
         
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
@@ -278,7 +279,7 @@ public Table minus (Table table2)
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        /*
+		/*
 		* Author: Dominic Balbed
 		*
 		* Implementing equi join 
@@ -296,33 +297,33 @@ public Table minus (Table table2)
         
 		// Compare the values of the given attributes
         for (int i = 0; i < this.tuples.size(); i++) 
-	{
-		for (int j = 0; j < table2.tuples.size(); j++) 
 		{
-			// If table 1 attr = table 2 attr 
-			if(this.tuples.get(i)[col1].compareTo(table2.tuples.get(j)[col2])==0)
+			for (int j = 0; j < table2.tuples.size(); j++) 
 			{
-				// create a new comparable array to combine tuples
-				int newSize = this.tuples.get(i).length + table2.tuples.get(j).length;
-				Comparable[] newTuple = new Comparable[newSize];
-				
-				// copy first tuple
-				int n = 0;
-				for(n = 0; n < this.tuples.get(i).length; n++)
+				// If table 1 attr = table 2 attr 
+				if(this.tuples.get(i)[col1].compareTo(table2.tuples.get(j)[col2])==0)
 				{
-					newTuple[n] = this.tuples.get(i)[n];
-				}//for
+					// create a new comparable array to combine tuples
+					int newSize = this.tuples.get(i).length + table2.tuples.get(j).length;
+					Comparable[] newTuple = new Comparable[newSize];
+					
+					// copy first tuple
+					int n = 0;
+					for(n = 0; n < this.tuples.get(i).length; n++)
+					{
+						newTuple[n] = this.tuples.get(i)[n];
+					}//for
 
-				// copy second tuple
-				for(int m = 0; m < table2.tuples.get(j).length; m++, n++)
-				{
-					newTuple[n] = table2.tuples.get(j)[m];
-				}//for
-				
-				rows.add(newTuple);
-			}//if	
+					// copy second tuple
+					for(int m = 0; m < table2.tuples.get(j).length; m++, n++)
+					{
+						newTuple[n] = table2.tuples.get(j)[m];
+					}//for
+					
+					rows.add(newTuple);
+				}//if	
+			}//for
 		}//for
-	}//for
 
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
@@ -374,7 +375,7 @@ public Table minus (Table table2)
         		rows.add(newTuple);
         	}//for
         }//for
-
+        
         // FIX - eliminate duplicate columns
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
