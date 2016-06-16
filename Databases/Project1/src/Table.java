@@ -201,14 +201,13 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        // copy all tuples from this table and table2
         for (int i = 0; i < this.tuples.size(); i++) {
         	rows.add(this.tuples.get(i));
         }
         for (int i = 0; i < table2.tuples.size(); i++) {
         	rows.add(table2.tuples.get(i));
         }
-        
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // union
@@ -253,7 +252,6 @@ public Table minus (Table table2)
     			}
     		}
     	}
-
         
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
@@ -280,7 +278,51 @@ public Table minus (Table table2)
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        /*
+		* Author: Dominic Balbed
+		*
+		* Implementing equi join 
+		*/
+        // get columns indices
+        int col1 = 0, col2 = 0;      
+        for(int i = 0; i < t_attrs.length; i++)
+        {
+        	col1 = col(t_attrs[i]);
+        }//for
+        for(int i = 0; i < u_attrs.length; i++)
+        {
+        	col2 = table2.col(u_attrs[i]);
+        }//for
+        
+		// Compare the values of the given attributes
+        for (int i = 0; i < this.tuples.size(); i++) 
+	{
+		for (int j = 0; j < table2.tuples.size(); j++) 
+		{
+			// If table 1 attr = table 2 attr 
+			if(this.tuples.get(i)[col1].compareTo(table2.tuples.get(j)[col2])==0)
+			{
+				// create a new comparable array to combine tuples
+				int newSize = this.tuples.get(i).length + table2.tuples.get(j).length;
+				Comparable[] newTuple = new Comparable[newSize];
+				
+				// copy first tuple
+				int n = 0;
+				for(n = 0; n < this.tuples.get(i).length; n++)
+				{
+					newTuple[n] = this.tuples.get(i)[n];
+				}//for
+
+				// copy second tuple
+				for(int m = 0; m < table2.tuples.get(j).length; m++, n++)
+				{
+					newTuple[n] = table2.tuples.get(j)[m];
+				}//for
+				
+				rows.add(newTuple);
+			}//if	
+		}//for
+	}//for
 
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
@@ -302,7 +344,36 @@ public Table minus (Table table2)
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        /*
+		* Author: Dominic Balbed
+		*
+		* Implementing natural join 
+		*/
+        // iterate over both tables
+        for(int i = 0; i < this.tuples.size(); i++)
+        {
+        	for(int j = 0; j < table2.tuples.size(); j++)
+        	{
+        		// create a new comparable array to combine tuples
+        		int newSize = this.tuples.get(i).length + table2.tuples.get(j).length;
+        		Comparable[] newTuple = new Comparable[newSize];
+        		
+        		// copy first tuple
+        		int n = 0;
+        		for(n = 0; n < this.tuples.get(i).length; n++)
+        		{
+        			newTuple[n] = this.tuples.get(i)[n];
+        		}//for
+
+        		// copy second tuple
+        		for(int m = 0; m < table2.tuples.get(j).length; m++, n++)
+        		{
+        			newTuple[n] = table2.tuples.get(j)[m];
+        		}//for
+        		
+        		rows.add(newTuple);
+        	}//for
+        }//for
 
         // FIX - eliminate duplicate columns
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
