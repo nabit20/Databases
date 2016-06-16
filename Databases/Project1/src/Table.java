@@ -192,10 +192,9 @@ public class Table
      * @param table2  the rhs table in the union operation
      * @return  a table representing the union
      */
-    
-    //Completed by Ashik
     public Table union (Table table2)
     {
+    	//Completed by Ashik
         out.println ("RA> " + name + ".union (" + table2.name + ")");
         if (! compatible (table2)) return null;
 
