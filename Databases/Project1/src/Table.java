@@ -508,11 +508,23 @@ public Table minus (Table table2)
      * @return  whether the tuple has the right size and values that comply
      *          with the given domains
      */
+    //completed by Alyssa Cowan
     private boolean typeCheck (Comparable [] t)
     { 
-        //  T O   B E   I M P L E M E N T E D 
+    	if (t.length != domain.length) //if lengths are different, return false
+    		return false;
+    	else {
+	    	int typeError=0; //if we find a Class type error, increment typeError count
+	    	for (int i=0; i<t.length; i++) {
+	    		if (!domain[i].isInstance(t[i])) //check if tuple's class is equal to domain
+	    			typeError++;
+	    	}
+	    	if (typeError == 0)
+	    		return true;
+	    	else
+	    		return false;
+    	}
 
-        return true;
     } // typeCheck
 
     /************************************************************************************
