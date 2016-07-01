@@ -1,4 +1,3 @@
-
 /************************************************************************************
  * @file LinHashMap.java
  *
@@ -20,7 +19,7 @@ public class LinHashMap <K, V>
 {
     /** The number of slots (for key-value pairs) per bucket.
      */
-    private static final int SLOTS = 4;
+    private static final int SLOTS = 30;
 
     /** The class for type K.
      */
@@ -85,6 +84,14 @@ public class LinHashMap <K, V>
         mod2   = 2 * mod1;
     } // constructor
 
+    public void addBuckets(){
+    	for(int i = 0; i< 10; i++){
+    		Bucket b1 = null;
+    		b1 = new Bucket(b1);
+    		hTable.add(b1);
+    	}
+    }
+    
     /********************************************************************************
      * Return a set containing all the entries as pairs of keys and values.
      * @return  the set view of the map
@@ -92,15 +99,8 @@ public class LinHashMap <K, V>
     public Set <Map.Entry <K, V>> entrySet ()
     {
         Set <Map.Entry <K, V>> enSet = new HashSet <> ();
-		
-        for(int i = 0; x < hTable.size(); i++)
-		{
-			Bucket b = hTable.get(i);
-			for(int j = 0; j < b.nKeys; j++)
-			{
-                enSet.add(new AbstractMap.SimpleEntry<>(b.key[j], b.value[j]));
-            }
-		}
+
+        //  T O   B E   I M P L E M E N T E D
             
         return enSet;
     } // entrySet
@@ -113,32 +113,17 @@ public class LinHashMap <K, V>
     public V get (Object key)
     {
         int i = h (key);
-        
-		if(i < split)
-		{
-            i = h2 (key);
-		}
-		
-        Bucket b = hTable.get(i);
-        
-		if(b.nKeys == 0)
-		{
-            return null;
+        V value = null;
+      
+        for(int j = 0; j < hTable.get(i).key.length; j++)
+        {
+        	if(hTable.get(i).key[j] == key){
+        		value = hTable.get(i).value[j];
+        	}
         }
-        
-		while(b != null)
-		{
-            for(int j=0; j<b.nKeys; j++)
-			{
-                if(key.equals(b.key[j]))
-				{
-                    return b.value[j];
-				}
-            }
-            b = b.next;
-		}
+        //  T O   B E   I M P L E M E N T E D
 
-        return null;
+        return value;
     } // get
 
     /********************************************************************************
@@ -150,102 +135,19 @@ public class LinHashMap <K, V>
     public V put (K key, V value)
     {
         int i = h (key);
-        if(i < split)
-		{
-            i = h2 (key);
-		}
-		out.println ("LinearHashMap.put: key = " + key + ", h() = " + i + ", value = " + value);
-		
-        Bucket b = hTable.get(i);
+        out.println ("LinearHashMap.put: key = " + key + ", h() = " + i + ", value = " + value);
         
-		if(b.nKeys < SLOTS)
-		{
-            b.key[b.nKeys] = key;
-            b.value[b.nKeys] = value;
-            b.nKeys++;
-        }else
-		{
-            hTable.add(new Bucket(null));
-            
-			while(b.next != null)
-			{
-                b = b.next;
-            }
-            
-			if(b.nKeys < SLOTS)
-			{
-                b.key[b.nKeys] = key;
-                b.value[b.nKeys] = value;
-                b.nKeys++;
-            }
-			else
-			{
-                b.next = new Bucket(null);
-                b = b.next;
-                b.key[b.nKeys] = key;
-                b.value[b.nKeys] = value;
-                b.nKeys++;
-            }
-            
-			int numKeys = 0;
-            
-			for(int j = 0; j < hTable.size();j++)
-			{
-                Bucket bkt = hTable.get(j);
-                
-				do
-				{
-                    numKeys = numKeys + bkt.nKeys;
-                    bkt = bkt.next;
-                }while(bkt !=null);
-            }
-            
-			double a = ((double)numKeys)/(SLOTS * mod1);
-            
-			if(a >= 1)
-			{
-                Bucket b2 = new Bucket(null);
-                Bucket b3 = new Bucket(null);
-                b = hTable.get(split);
-               
-			   for(int k = 0; k < b.nKeys; k++)
-			   {
-                    int z = h2(b.key[k]);
-                    
-					if(z == split)
-					{
-                        if(b2.next == null)
-						{
-                            b2.next = new Bucket(null);
-                            b2 = b2.next;
-                        }
-                        b2.key[b2.nKeys] = b.key[k];
-                        b2.value[b2.nKeys] = b.value[k];
-                        b2.nKeys++;
-                    }
-					else
-					{
-                        if(b3.next == null)
-						{
-                            b3.next = new Bucket(null);
-                            b3 = b3.next;
-                        }
-                        b3.key[b3.nKeys] = b.key[k];
-                        b3.value[b3.nKeys] = b.value[k];
-                    }
-                }
-                if(split == mod1 - 1)
-				{
-                    mod1 = mod1 * 2;
-                    mod2 = mod1 * 2;
-                    split = 0;
-                }
-				else
-				{
-                    split++;
-                }
-            }   
-		}
+        for(int j = 0; j < hTable.get(i).key.length; j++)
+        {
+        	if(hTable.get(i).key[j] == null && hTable.get(i).value[j] == null){
+        		hTable.get(i).key[j] = key; 
+        		hTable.get(i).value[j] = value;
+        		break;
+        	}
+        }
+
+
+        //  T O   B E   I M P L E M E N T E D
 
         return null;
     } // put
@@ -267,55 +169,7 @@ public class LinHashMap <K, V>
         out.println ("Hash Table (Linear Hashing)");
         out.println ("-------------------------------------------");
 
-        for(int i=0; i<hTable.size();i++)
-		{
-            out.print(i + ":");
-            Bucket tmp = hTable.get(i);
-            boolean chain = false;
-            if(tmp.next != null)
-			{
-                chain = true;
-            }
-			if(chain)
-			{
-                out.print("[ ");
-                
-				for(int j = 0; j < SLOTS; j++)
-				{
-                    out.print(tmp.key[j]);
-                    if(SLOTS != j+1)
-					{
-                        out.print(", ");
-					}
-					else
-					{
-                        out.print(" ] --> ");
-					}
-                }
-				
-                out.print("[ ");
-				
-                for(int k = 0; k < SLOTS; k++)
-				{
-                    out.print(tmp.next.key[k]);
-                    if(SLOTS != k+1)
-					{
-                        out.print(" ]");
-					}
-                }
-            }
-			else
-			{
-                out.print("[ ");
-                for(int l = 0; l < SLOTS; l++){
-                    out.print(tmp.key[l]);
-                    if(SLOTS != l+1)
-                        out.print(", ");
-                }
-                out.print(" ]");
-            }
-            out.println();
-		}
+        //  T O   B E   I M P L E M E N T E D
 
         out.println ("-------------------------------------------");
     } // print
@@ -346,13 +200,15 @@ public class LinHashMap <K, V>
      */
     public static void main (String [] args)
     {
-
+    	
         int totalKeys    = 30;
         boolean RANDOMLY = false;
-
+        
         LinHashMap <Integer, Integer> ht = new LinHashMap <> (Integer.class, Integer.class);
+        ht.addBuckets();
         if (args.length == 1) totalKeys = Integer.valueOf (args [0]);
 
+        
         if (RANDOMLY) {
             Random rng = new Random ();
             for (int i = 1; i <= totalKeys; i += 2) ht.put (rng.nextInt (2 * totalKeys), i * i);
