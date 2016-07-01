@@ -143,6 +143,7 @@ public class LinHashMap <K, V>
         for(int j = 0; j < hTable.get(i).key.length; j++)
         {
         	if(hTable.get(i).key[j] == null && hTable.get(i).value[j] == null){
+        		count++;
         		hTable.get(i).key[j] = key; 
         		hTable.get(i).value[j] = value;
         		inserted = true;
@@ -154,6 +155,7 @@ public class LinHashMap <K, V>
         	int counter = 1;
         	for(int j = 0; j < hTable.get(i+counter).key.length; j++){
             	if(hTable.get(i+counter).key[j] == null && hTable.get(i+counter).value[j] == null){
+            		count++;
             		hTable.get(i+counter).key[j] = key; 
             		hTable.get(i+counter).value[j] = value;
             		inserted = true;
@@ -163,6 +165,7 @@ public class LinHashMap <K, V>
         	if(i + counter - 1 == hTable.get(i = i - 1).key.length){
             	for(int j = 0; j < hTable.get(i = i - 1).key.length; j++){
                 	if(hTable.get(i = i - 1).key[j] == null && hTable.get(i = i - 1).key[j] == null){
+                		count++;
                 		hTable.get(i = i - 1).key[j] = key; 
                 		hTable.get(i = i - 1).value[j] = value;
                 		inserted = true;
