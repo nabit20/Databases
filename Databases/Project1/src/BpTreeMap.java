@@ -560,9 +560,9 @@ public class BpTreeMap <K extends Comparable <K>, V>
      * @param n    the current node
      * @return  the right sibling node (may wish to provide more information)
      */
-    private Node splitL (K key, V ref, Node n)
+     private Node splitL (K key, V ref, Node n)
     {
-        out.println ("splitL I think is correct");
+    	 out.println ("splitL I think is correct");
          Node rt = new Node (true);
          List<K> k = new ArrayList<K>();
          
@@ -605,10 +605,11 @@ public class BpTreeMap <K extends Comparable <K>, V>
         		 if(i == n.nKeys-MID-1) {
         			 //rightmost reference equals n's rightmost reference
         			 rt.ref[i] = n.ref[n.nKeys-1];
+        			 n.ref[n.nKeys-1] = null;
         		 }       		 
         	 }
         	 else {
-    			 rt.ref[i] = null;
+    			// rt.ref[i] = null;
     		 }
          }
          
@@ -631,41 +632,94 @@ public class BpTreeMap <K extends Comparable <K>, V>
      */
     private Node splitI (K key, Node ref, Node n)
     {	
-		List<Pair> pairs = new ArrayList<>();
-		Object firstRef = n.ref[0];
-        //out.println ("splitI not implemented yet");
-        Node rt = new Node (false);
-
-        //  T O   B E   I M P L E M E N T E D
+        Node rt = new Node (true);
+        List<K> k = new ArrayList<K>();
+        List<V> v = new ArrayList<V>();
         
-		for (int i = 0; i < n.nKeys; i++){
-			pairs.add(new Pair(n.key[i], n.ref[i + 1]));
-		}
-		pairs.add(new Pair(key, ref));
-		
-		Comparator<Pair> comparator = new Comparator<BpTree<K,V>.Pair>() {
-			public int compare(Pair o1, Pair o2) {
-				return o1.key.compareTo(o2.key);
-			}
-		};
-		
-		Collections.sort(pairs, comparator);
-		
-		n.ref[0] = firstRef;
-		n.nKeys = 0;
-		for (int i = 0; i < MID; i++){
-			n.key[i] = pairs.get(i).key;
-			n.ref[i + 1] = pairs.get(i).ref;
-			n.nKeys++;
-		}
-		
-		for (int i = MID; i < pairs.size(); i++){
-			rt.key[i - MID] = pairs.get(i).key;
-			rt.ref[i - MID+1] = pairs.get(i).ref;
-			rt.nKeys++;
-		}
-		
-        return rt;
+        int position;
+        
+        //Places keys into list in order         
+        for (int i = 0; i < n.nKeys; i++) {
+       	 if (key.compareTo(n.key[i]) < 0) {
+       		 k.add(i, key);
+       		 position = i;
+       		 for (int j = i; j < n.nKeys; j++) {
+       			 k.add(j+1,n.key[j]);
+       		 }
+       		 break;
+       	 }
+       	 else {
+       		 k.add(i, n.key[i]);
+       	 }
+       	 //final loop means new key is largest key
+       	 if (i == n.nKeys-1) {
+       		 k.add(n.nKeys, key);    
+       		 position = n.nKeys;
+       	 }
+       	 
+        }
+        
+        //Place reference keys into list
+        v.add(position + 1, (V) ref);
+        for (int i = 0; i < n.nKeys; i++) {
+        	if (i <= position) {
+        		v.add(i, (V) n.ref[i]);        		
+        	}
+        	if (i > position) {
+        		v.add(i+1, (V) n.ref[i]);
+        	}
+        }
+        
+        //Make all values null
+        for (int i = 0; i < n.nKeys; i++) {
+        	n.key[i] = null;
+        	n.ref[i] = null;
+        }
+        n.ref[n.nKeys] = null;
+        
+        //Fill in key values first
+        //First for n
+        for(int i = 0; i < n.nKeys; i++) {
+        	if (i < MID) {
+        		n.key[i] = k.get(i);
+        	}
+        	else {
+        		n.key[i] = null;
+        	}
+        }
+        
+        //Insert key values for rt
+        for (int i = 0; i < n.nKeys; i++) {
+        //We exclude middle value
+       	 if (i < n.nKeys-MID-1) {
+       		 rt.key[i] = k.get(MID + i + 1);       		      		 
+       	 }
+       	 else {
+   			 //rt.ref[i] = null;
+   		 }
+        }
+        
+        //Fill in ref values for n
+        for(int i = 0; i <= n.nKeys; i++) {
+        	if (i <= MID) {
+        		n.ref[i] = v.get(i);
+        	}
+        	else {
+        		//n.key[i] = null;
+        	}
+        }
+        
+        //Fill in ref values for rt
+        for (int i = 0; i <= n.nKeys; i++) {
+        	if (i < n.nKeys-MID) {
+          		 rt.ref[i] = v.get(MID + i);       		      		 
+          	 }
+          	 else {
+      			 //rt.ref[i] = null;
+      		 }
+        }
+        
+       return rt;
     } // splitI
 
     
