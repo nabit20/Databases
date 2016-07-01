@@ -19,7 +19,7 @@ public class LinHashMap <K, V>
 {
     /** The number of slots (for key-value pairs) per bucket.
      */
-    private static final int SLOTS = 30;
+    private static final int SLOTS = 4;
 
     /** The class for type K.
      */
@@ -114,12 +114,14 @@ public class LinHashMap <K, V>
     {
         int i = h (key);
         V value = null;
-      
-        for(int j = 0; j < hTable.get(i).key.length; j++)
-        {
-        	if(hTable.get(i).key[j] == key){
-        		value = hTable.get(i).value[j];
-        	}
+
+        for(int h = 0; h < hTable.size(); h++){     	
+	        for(int j = 0; j < hTable.get(h).key.length; j++)
+	        {
+	        	if(hTable.get(h).key[j] == key){
+	        		value = hTable.get(h).value[j];
+	        	}
+	        }
         }
         //  T O   B E   I M P L E M E N T E D
 
@@ -135,6 +137,7 @@ public class LinHashMap <K, V>
     public V put (K key, V value)
     {
         int i = h (key);
+        boolean inserted = false;
         out.println ("LinearHashMap.put: key = " + key + ", h() = " + i + ", value = " + value);
         
         for(int j = 0; j < hTable.get(i).key.length; j++)
@@ -142,11 +145,35 @@ public class LinHashMap <K, V>
         	if(hTable.get(i).key[j] == null && hTable.get(i).value[j] == null){
         		hTable.get(i).key[j] = key; 
         		hTable.get(i).value[j] = value;
-        		break;
+        		inserted = true;
+        		return null;
         	}
         }
-
-
+        
+        while(inserted == false){
+        	int counter = 1;
+        	for(int j = 0; j < hTable.get(i+counter).key.length; j++){
+            	if(hTable.get(i+counter).key[j] == null && hTable.get(i+counter).value[j] == null){
+            		hTable.get(i+counter).key[j] = key; 
+            		hTable.get(i+counter).value[j] = value;
+            		inserted = true;
+            		return null;
+            	}
+        	}
+        	if(i + counter - 1 == hTable.get(i = i - 1).key.length){
+            	for(int j = 0; j < hTable.get(i = i - 1).key.length; j++){
+                	if(hTable.get(i = i - 1).key[j] == null && hTable.get(i = i - 1).key[j] == null){
+                		hTable.get(i = i - 1).key[j] = key; 
+                		hTable.get(i = i - 1).value[j] = value;
+                		inserted = true;
+                		return null;
+                	}
+            	}
+        	}
+        	else{
+        		counter++;
+        	}
+        }	
         //  T O   B E   I M P L E M E N T E D
 
         return null;
@@ -169,6 +196,18 @@ public class LinHashMap <K, V>
         out.println ("Hash Table (Linear Hashing)");
         out.println ("-------------------------------------------");
 
+        for(int h = 0; h < hTable.size(); h++){
+        	out.println("Bucket" + h);
+        	out.println();
+	        for(int j = 0; j < hTable.get(h).key.length; j++)
+	        {
+	        	
+	        	out.println("index " + j + ": " + hTable.get(h).value[j]);
+	        	
+	        }
+	        out.println("-----------------------------------------------");
+        }
+        
         //  T O   B E   I M P L E M E N T E D
 
         out.println ("-------------------------------------------");
