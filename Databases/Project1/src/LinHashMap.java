@@ -84,6 +84,9 @@ public class LinHashMap <K, V>
         mod2   = 2 * mod1;
     } // constructor
 
+    /*
+     * Add buckets to the hash table
+     */
     public void addBuckets(){
     	for(int i = 0; i< 10; i++){
     		Bucket b1 = null;
@@ -137,23 +140,23 @@ public class LinHashMap <K, V>
     public V put (K key, V value)
     {
         int i = h (key);
-        boolean inserted = false;
+        boolean inserted = false; //Determine whether to exit loop to add or not
         out.println ("LinearHashMap.put: key = " + key + ", h() = " + i + ", value = " + value);
         
-        for(int j = 0; j < hTable.get(i).key.length; j++)
+        for(int j = 0; j < hTable.get(i).key.length; j++) // Case of inserting into index i
         {
         	if(hTable.get(i).key[j] == null && hTable.get(i).value[j] == null){
         		count++;
-        		hTable.get(i).key[j] = key; 
-        		hTable.get(i).value[j] = value;
+        		hTable.get(i).key[j] = key;  //adding key
+        		hTable.get(i).value[j] = value; //adding value
         		inserted = true;
         		return null;
         	}
         }
         
         while(inserted == false){
-        	int counter = 1;
-        	for(int j = 0; j < hTable.get(i+counter).key.length; j++){
+        	int counter = 1; // Counter to increment the index
+        	for(int j = 0; j < hTable.get(i+counter).key.length; j++){ //Case of index i filled, by open addressing we look for the next available index to insert
             	if(hTable.get(i+counter).key[j] == null && hTable.get(i+counter).value[j] == null){
             		count++;
             		hTable.get(i+counter).key[j] = key; 
@@ -163,7 +166,7 @@ public class LinHashMap <K, V>
             	}
         	}
         	if(i + counter - 1 == hTable.get(i = i - 1).key.length){
-            	for(int j = 0; j < hTable.get(i = i - 1).key.length; j++){
+            	for(int j = 0; j < hTable.get(i = i - 1).key.length; j++){ //Case where the index is the last one, then we move to the first index to insert
                 	if(hTable.get(i = i - 1).key[j] == null && hTable.get(i = i - 1).key[j] == null){
                 		count++;
                 		hTable.get(i = i - 1).key[j] = key; 
@@ -175,7 +178,7 @@ public class LinHashMap <K, V>
         	}
         	else{
         		counter++;
-        	}
+        	}//else
         }	
         //  T O   B E   I M P L E M E N T E D
 
@@ -199,7 +202,7 @@ public class LinHashMap <K, V>
         out.println ("Hash Table (Linear Hashing)");
         out.println ("-------------------------------------------");
 
-        for(int h = 0; h < hTable.size(); h++){
+        for(int h = 0; h < hTable.size(); h++){ //Prints the hash table, everything below
         	out.println("Bucket" + h);
         	out.println();
 	        for(int j = 0; j < hTable.get(h).key.length; j++)
