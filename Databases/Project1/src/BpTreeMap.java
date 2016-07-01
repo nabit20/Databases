@@ -562,54 +562,56 @@ public class BpTreeMap <K extends Comparable <K>, V>
      */
     private Node splitL (K key, V ref, Node n)
     {
-        // out.println ("splitL I think is correct");
-        Node rt = new Node (true);
-
-        int j = 0;
-        for (int i = MID; i < ORDER-1; i++) { 
-         rt.key[j] = n.key[i]; //put key from current node into rt
-         rt.ref[j] = n.ref[i]; //update reference from current node into rt
-         n.key[i] = null; //delete transfered node from current node
-         n.nKeys--; //update nKey values in n and rt
-         rt.nKeys++;
+        out.println ("splitL I think is correct");
+         Node rt = new Node (true);
+         List<K> k = new ArrayList<K>();
          
-         if (i == MID) { //on first loop, update last reference to point to new rt
-          n.ref[i] = (Node) rt;
-         }
-         else if (i == ORDER-2) { //on last loop, update last pointer from n to last pointer in rt
-          rt.ref[rt.nKeys] = n.ref[ORDER-1];
-          n.ref[ORDER-1] = null;
-         }
-         else { //otherwise, get rid of reference once transfered
-          n.ref[i] = null;
-         }
-         j++;
-        }
-        //place into node **********FIND OUT WHERE IT NEEDS TO BE INSERTED
-        if (key.compareTo(n.key[n.nKeys-1]) < 0) { //if new key is less
-         //key belongs in n
-         int place = 0;
+         //Places keys into lists in order         
          for (int i = 0; i < n.nKeys; i++) {
-          if (key.compareTo(n.key[i]) < 0) {
-           place++;
-          }
+        	 if (key.compareTo(n.key[i]) < 0) {
+        		 k.add(i, key);
+        		 for (int j = i; j < n.nKeys; j++) {
+        			 k.add(j+1,n.key[j]);
+        		 }
+        		 break;
+        	 }
+        	 else {
+        		 k.add(i, n.key[i]);
+        	 }
+        	 //final loop means new key is largest key
+        	 if (i == n.nKeys-1) {
+        		 k.add(n.nKeys, key);        		      		 
+        	 }
+        	 
          }
-         wedgeL(key, ref, n, place);
-        }
-        else if (key.compareTo(n.key[n.nKeys-1]) == 0) {
-         System.out.println("Split: Key already exists");
-        }
-        else { //new key is greater
-         //key belongs in rt
-         int place = 0;
-         for (int i = 0; i < rt.nKeys; i++) {
-          if (key.compareTo(rt.key[i]) < 0) {
-           place++;
-          }
+         
+         //Now we can fill keys in n and rt
+         for (int i = 0; i < n.nKeys; i++) {
+        	 if (i < MID) {
+        		 n.key[i] = k.get(i);
+        		 //rightmost reference points to rt
+        		 if (i == MID-1){
+        			 n.ref[i] = (Node)rt;
+        		 }
+        	 }
+        	 else {
+        		 n.key[i] = null;
+        	 }
          }
-         wedgeL(key, ref, rt, place);
-        }
-
+         
+         for (int i = 0; i < n.nKeys; i++) {
+        	 if (i < n.nKeys-MID) {
+        		 rt.key[i] = k.get(MID + i);
+        		 if(i == n.nKeys-MID-1) {
+        			 //rightmost reference equals n's rightmost reference
+        			 rt.ref[i] = n.ref[n.nKeys-1];
+        		 }       		 
+        	 }
+        	 else {
+    			 rt.ref[i] = null;
+    		 }
+         }
+         
         return rt;
     } // splitL
 
