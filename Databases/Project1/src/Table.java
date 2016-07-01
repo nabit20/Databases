@@ -277,54 +277,64 @@ public class Table
         String [] u_attrs = attributes2.split (" ");
 
         List <Comparable []> rows = new ArrayList <> ();
-
-		/*
-		* Author: Dominic Balbed
-		*
-		* Implementing equi join 
-		*/
         // get columns indices
         int col1 = 0, col2 = 0;      
         for(int i = 0; i < t_attrs.length; i++)
         {
-        	col1 = col(t_attrs[i]);
+         col1 = col(t_attrs[i]);
         }//for
         for(int i = 0; i < u_attrs.length; i++)
         {
-        	col2 = table2.col(u_attrs[i]);
+         col2 = table2.col(u_attrs[i]);
         }//for
         
-		// Compare the values of the given attributes
-        for (int i = 0; i < this.tuples.size(); i++) 
-		{
-			for (int j = 0; j < table2.tuples.size(); j++) 
+        //get new attributes for combined table minus duplicate columns
+        String[] newAttrs= new String[this.attribute.length + table2.attribute.length - u_attrs.length];
+        int n= 0;
+        for (int i = 0; i < this.attribute.length; i++) {
+         newAttrs[n]= this.attribute[i];
+         n++;
+        } //for
+        for (int i = 0; i < table2.attribute.length; i++) {
+         if (i != col2) {
+          newAttrs[n] = table2.attribute[i];
+          n++;
+         } //if
+        } //for
+        
+		  // Compare the values of the given attributes
+				for (int i = 0; i < this.tuples.size(); i++) 
+		  {
+		   for (int j = 0; j < table2.tuples.size(); j++) 
+		   {
+			// If table 1 attr = table 2 attr 
+			if(this.tuples.get(i)[col1].compareTo(table2.tuples.get(j)[col2])==0)
 			{
-				// If table 1 attr = table 2 attr 
-				if(this.tuples.get(i)[col1].compareTo(table2.tuples.get(j)[col2])==0)
-				{
-					// create a new comparable array to combine tuples
-					int newSize = this.tuples.get(i).length + table2.tuples.get(j).length;
-					Comparable[] newTuple = new Comparable[newSize];
-					
-					// copy first tuple
-					int n = 0;
-					for(n = 0; n < this.tuples.get(i).length; n++)
-					{
-						newTuple[n] = this.tuples.get(i)[n];
-					}//for
+			 // create a new comparable array to combine tuples
+			 int newSize = this.tuples.get(i).length + table2.tuples.get(j).length - u_attrs.length;
+			 Comparable[] newTuple = new Comparable[newSize];
+			 
+			 // copy first tuple
+			 for(n = 0; n < this.tuples.get(i).length; n++)
+			 {
+			  newTuple[n] = this.tuples.get(i)[n];
+			 }//for
 
-					// copy second tuple
-					for(int m = 0; m < table2.tuples.get(j).length; m++, n++)
-					{
-						newTuple[n] = table2.tuples.get(j)[m];
-					}//for
-					
-					rows.add(newTuple);
-				}//if	
-			}//for
-		}//for
+			 // copy second tuple
+			 for(int m = 0; m < table2.tuples.get(j).length; m++)
+			 {
+			  if (m != col2) {
+			   newTuple[n] = table2.tuples.get(j)[m];
+			   n++;
+			  }
+			 }//for
+			 
+			 rows.add(newTuple);
+			}//if 
+		   }//for
+		  }//for
 
-        return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
+        return new Table (name + count++, newAttrs,
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
     } // join
 
@@ -345,38 +355,124 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         /*
-		* Author: Dominic Balbed
-		*
-		* Implementing natural join 
-		*/
-        // iterate over both tables
-        for(int i = 0; i < this.tuples.size(); i++)
-        {
-        	for(int j = 0; j < table2.tuples.size(); j++)
-        	{
-        		// create a new comparable array to combine tuples
-        		int newSize = this.tuples.get(i).length + table2.tuples.get(j).length;
-        		Comparable[] newTuple = new Comparable[newSize];
-        		
-        		// copy first tuple
-        		int n = 0;
-        		for(n = 0; n < this.tuples.get(i).length; n++)
-        		{
-        			newTuple[n] = this.tuples.get(i)[n];
-        		}//for
-
-        		// copy second tuple
-        		for(int m = 0; m < table2.tuples.get(j).length; m++, n++)
-        		{
-        			newTuple[n] = table2.tuples.get(j)[m];
-        		}//for
-        		
-        		rows.add(newTuple);
-        	}//for
-        }//for
+		  *
+		  * Implementing natural join 
+		  */
         
-        // FIX - eliminate duplicate columns
-        return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
+        //find duplicate column names
+        boolean foundDup = false; //found duplicates
+        int[] table1Dup = null; //hold indices of duplicate column(s) from table1
+        int[] table2Dup = null; //hold indices of duplicate column(s) from table2
+        //note: duplicates will have matching indices in the arrays
+        //ex. the indices for the first matching column names in table1 and table2 will be at table1Dup[0] and table2Dup[0]
+        int count = 0;
+        for (int i = 0; i < this.attribute.length; i++) {
+         for (int j = 0; j < table2.attribute.length; j++) {
+          if (this.attribute.equals(table2.attribute)) {
+           table1Dup[count] = i;
+           table2Dup[count] = j;
+           count++;
+           foundDup = true;
+          }
+           
+         }
+        }
+        
+        String[] newAttrs= new String[this.attribute.length + table2.attribute.length - count];
+        if (foundDup) {
+         //get new attributes for combined table minus duplicate columns
+         int n= 0;
+         for (int i = 0; i < this.attribute.length; i++) {
+          newAttrs[n]= this.attribute[i];
+          n++;
+         } //for
+         for (int i = 0; i < table2.attribute.length; i++) {
+          boolean check = true;
+          for (int j = 0; j < table2Dup.length; j++) {
+           if (i == table2Dup[j]) {
+            check = false;
+           }
+          }
+          if (check) { //if i is not in any of the matched duplicate indices then add
+           newAttrs[n] = table2.attribute[i];
+           n++;
+          } //if
+         } //for
+                 
+   // Compare the values of the given attributes
+   for (int i = 0; i < this.tuples.size(); i++) 
+   {
+    for (int j = 0; j < table2.tuples.size(); j++) 
+    {
+     boolean check = true; //check to see if values in duplicate columns are equal
+     
+     for (int k = 0; k < table2Dup.length; k++) { //check to see if equal at all parts of tuples
+      if (this.tuples.get(i)[table1Dup[k]].compareTo(table2.tuples.get(j)[table2Dup[k]])!=0) {
+       check = false; //if ever not equal, mark false
+      }
+     }
+     // If table 1 attrs = table 2 attrs 
+     if(check)
+     {
+      // create a new comparable array to combine tuples
+      int newSize = this.tuples.get(i).length + table2.tuples.get(j).length - table2Dup.length;
+      Comparable[] newTuple = new Comparable[newSize];
+      
+      // copy first tuple
+      for(n = 0; n < this.tuples.get(i).length; n++)
+      {
+       newTuple[n] = this.tuples.get(i)[n];
+      }//for
+ 
+      // copy second tuple
+      for (int m = 0; m < table2.tuples.get(j).length; m++) {
+       check = true;
+       for (int k = 0; k < table2Dup.length; k++) {
+        if (m == table2Dup[k])
+         check = false;
+       }
+       if (check) {
+        newTuple[n] = table2.tuples.get(j)[m];
+        n++;
+       }
+      } //for
+      
+      rows.add(newTuple);
+     }//if 
+    }//for
+   }//for
+        }
+        else {
+         newAttrs = ArrayUtil.concat (attribute, table2.attribute);
+         //if no duplicate column names are found
+         // iterate over both tables
+         for(int i = 0; i < this.tuples.size(); i++)
+         {
+          for(int j = 0; j < table2.tuples.size(); j++)
+          {
+           // create a new comparable array to combine tuples
+           int newSize = this.tuples.get(i).length + table2.tuples.get(j).length;
+           Comparable[] newTuple = new Comparable[newSize];
+           
+           // copy first tuple
+           int n = 0;
+           for(n = 0; n < this.tuples.get(i).length; n++)
+           {
+            newTuple[n] = this.tuples.get(i)[n];
+           }//for
+ 
+           // copy second tuple
+           for(int m = 0; m < table2.tuples.get(j).length; m++, n++)
+           {
+            newTuple[n] = table2.tuples.get(j)[m];
+           }//for
+           
+           rows.add(newTuple);
+          }//for
+         }//for
+        }//else
+        
+        return new Table (name + count++, newAttrs,
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
     } // join
 
